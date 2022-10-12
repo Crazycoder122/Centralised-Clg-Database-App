@@ -4,7 +4,8 @@ const subjectSchema = mongoose.Schema({
   name : String,
   code : String,
   is_practical : Boolean,
-  semester : Number
+  is_compulsory : Boolean,
+  semester : Number,
 });
 
 export default mongoose.model("Subject Model", subjectSchema);
