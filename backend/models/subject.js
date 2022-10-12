@@ -6,6 +6,7 @@ const subjectSchema = mongoose.Schema({
   is_practical : Boolean,
   is_compulsory : Boolean,
   semester : Number,
+  credits : Number
 });
 
 export default mongoose.model("Subject Model", subjectSchema);
