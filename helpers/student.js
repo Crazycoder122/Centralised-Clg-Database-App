@@ -35,7 +35,8 @@ export const createStudent = (req, res) => {
   let rollNumber = content.roll;
   let cgpa = content.cgpa;
   let email = content.email;
-  let newObj = { name, rollNumber, cgpa, email };
+  let address = content.email;
+  let newObj = { name, rollNumber, cgpa, email, address};
 
   console.log(newObj)
   let returnMsg = null;
@@ -110,7 +111,8 @@ export const updateStudent = (req, res) => {
   let rollNumber = content.roll;
   let cgpa = content.cgpa;
   let email = content.email;
-  let newObj = { name, rollNumber, cgpa, email };
+  let address = content.address;
+  let newObj = { name, rollNumber, cgpa, email, address};
 
   
   let new_JSON_Array = [];
@@ -156,6 +158,6 @@ export const updateStudent = (req, res) => {
   }
 
   fs.writeFileSync(studentDB,JSON.stringify(new_JSON_Array));
-  
+
   res.send(returnMsg);
 };
