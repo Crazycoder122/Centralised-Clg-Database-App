@@ -36,7 +36,8 @@ export const createStudent = (req, res) => {
   let cgpa = content.cgpa;
   let email = content.email;
   let address = content.email;
-  let newObj = { name, rollNumber, cgpa, email, address};
+  let placementRecord = content.placement;
+  let newObj = { name, rollNumber, cgpa, email, address,placementRecord};
 
   console.log(newObj)
   let returnMsg = null;
@@ -112,7 +113,8 @@ export const updateStudent = (req, res) => {
   let cgpa = content.cgpa;
   let email = content.email;
   let address = content.address;
-  let newObj = { name, rollNumber, cgpa, email, address};
+  let placementRecord = content.placement;
+  let newObj = { name, rollNumber, cgpa, email, address,placementRecord};
 
   
   let new_JSON_Array = [];
