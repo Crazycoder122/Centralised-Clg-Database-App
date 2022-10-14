@@ -1,0 +1,30 @@
+{
+  "name": "centralised-clg-database-app",
+  "version": "1.0.0",
+  "description": "1. Krishnendu Dasgupta\r 2. Koustabh Das\r 3. Kuntal Garai\r 4. Sohan Kanji\r 5. Labani Marik",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Crazycoder122/Centralised-Clg-Database-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Crazycoder122/Centralised-Clg-Database-App/issues"
+  },
+  "homepage": "https://github.com/Crazycoder122/Centralised-Clg-Database-App#readme",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
