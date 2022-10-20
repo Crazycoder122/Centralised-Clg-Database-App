@@ -13,8 +13,8 @@ app.use(bodyParser.json())
 
 // Route Imports
 import studentRoutes from './routes/student.js';
-// import teacherRoutes from './routes/teacher.js';
-// import nonTeacherRoutes from './routes/nonTeacher.js';
+import teacherRoutes from './routes/teacher.js';
+import nonTeacherRoutes from './routes/nonTeacher.js';
 
 
 
@@ -23,8 +23,8 @@ import studentRoutes from './routes/student.js';
 
 // Route Settings
 app.use('/student',studentRoutes);
-// app.use('/teacher',teacherRoutes);
-// app.use('/nonTeacher',nonTeacherRoutes);
+app.use('/teacher',teacherRoutes);
+app.use('/nonTeacher',nonTeacherRoutes);
 
 
 

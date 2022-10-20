@@ -1,5 +1,10 @@
 import express from "express";
-import {} from "../helpers/nonTeacher.js";
+import {
+  getEmployees,
+  createEmployee,
+  deleteEmployee,
+  updateEmployee
+} from "../helpers/nonTeacher.js";
 
 const Router = express.Router();
 
