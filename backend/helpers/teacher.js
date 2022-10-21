@@ -30,7 +30,7 @@ export const createTeacher = (req, res) => {
   let name = content.name;
   let email = content.email;
   let age = content.age;
-  let joinedAt = content.joined;
+  let joinedAt = content.joinedAt;
   let researchInterests = content.research;
   let subjectsAssigned = content.subjectsAssigned;
 
