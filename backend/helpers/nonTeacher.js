@@ -146,7 +146,8 @@ export const updateEmployee = (req, res) => {
     }
 
     fs.writeFileSync(employeeDB, JSON.stringify(new_JSON_Array));
-
-    res.send(returnMsg);
   }
+
+  res.send(returnMsg);
+
 };

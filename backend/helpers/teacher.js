@@ -7,6 +7,15 @@ const __dirname = path.dirname(__filename);
 
 const teacherDB = path.join(__dirname, "../Databases/teacher.json");
 
+const checkIfNoMidification = (obj, objArray) => {
+  for (let i of objArray) {
+    if (JSON.stringify(obj) === JSON.stringify(i)) return true;
+  }
+
+  return false;
+};
+
+
 export const getTeachers = (req, res) => {
   const fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
 
@@ -72,7 +81,7 @@ export const deleteTeacher = (req, res) => {
   let returnMsg = null;
 
   for (let i of fileContent) {
-    if (i.email == email) {
+    if (i.email === email) {
       returnMsg = {
         msg: "Success",
       };
@@ -84,6 +93,8 @@ export const deleteTeacher = (req, res) => {
   }
 
   if (returnMsg == null) {
+
+    console.log("Hello world");
     returnMsg = {
       msg: "Failure",
       error: "Teacher with Given Email Address does not exist",
@@ -102,8 +113,8 @@ export const updateTeacher = (req, res) => {
   let name = content.name;
   let email = content.email;
   let age = content.age;
-  let joinedAt = content.joined;
-  let researchInterests = content.research;
+  let joinedAt = content.joinedAt;
+  let researchInterests = content.researchInterests;
   let subjectsAssigned = content.subjectsAssigned;
 
   let newObj = {
@@ -115,11 +126,13 @@ export const updateTeacher = (req, res) => {
     subjectsAssigned,
   };
 
+
   let returnMsg = null;
   let new_JSON_Array = [];
 
   const fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
   if (checkIfNoMidification(newObj, fileContent)) {
+
     returnMsg = {
       msg: "Failure",
       error: "No Modification to the original record",
@@ -153,7 +166,8 @@ export const updateTeacher = (req, res) => {
     }
 
     fs.writeFileSync(teacherDB, JSON.stringify(new_JSON_Array));
-
-    res.send(returnMsg);
   }
+
+  res.send(returnMsg);
+
 };

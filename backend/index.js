@@ -2,6 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 // Configurations for the Backend
 dotenv.config();
@@ -9,7 +10,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 80;
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+app.use(cors());
 
 // Route Imports
 import studentRoutes from './routes/student.js';
