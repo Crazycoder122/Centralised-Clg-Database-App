@@ -26,22 +26,23 @@ export const getStudents = (req, res) => {
 export const createStudent = (req, res) => {
   const content = req.body;
 
-  let name = content.name;
-  let rollNumber = content.roll;
-  let cgpa = content.cgpa;
-  let email = content.email;
-  let address = content.email;
-  let placementRecord = content.placement;
-  let stream = content.stream;
-  let semester = content.semester;
-  let newObj = { name, rollNumber, cgpa, email, address, placementRecord, stream, semester };
+  let Name = content.Name;
+  let Roll_Number = content.Roll_Number;
+  let CGPA = content.CGPA;
+  let Email = content.Email;
+  let Address = content.Address;
+  let Placement_Record = content.Placement_Record;
+  let Stream = content.Stream;
+  let Semester = content.Semester;
+
+  let newObj = { Name, Roll_Number, CGPA, Email, Address, Placement_Record, Stream, Semester };
 
   let returnMsg = null;
 
   const fileContent = JSON.parse(fs.readFileSync(studentDB, "utf-8"));
 
   for (let i of fileContent) {
-    if (i.rollNumber === newObj.rollNumber || i.email == newObj.email) {
+    if (i.Roll_Number === newObj.Roll_Number || i.Email == newObj.Email) {
       returnMsg = {
         msg: "Failure",
         error: "Student with the same Roll Number/Email exists",
@@ -66,7 +67,7 @@ export const createStudent = (req, res) => {
 };
 
 export const deleteStudent = (req, res) => {
-  const roll = req.body.roll;
+  const roll = req.body.Roll_Number;
 
   let fileContent = JSON.parse(fs.readFileSync(studentDB, "utf-8"));
 
@@ -74,7 +75,7 @@ export const deleteStudent = (req, res) => {
   let returnMsg = null;
 
   for (let i of fileContent) {
-    if (i.rollNumber == roll) {
+    if (i.Roll_Number == roll) {
       returnMsg = {
         msg: "Success",
       };
@@ -102,15 +103,16 @@ export const deleteStudent = (req, res) => {
 export const updateStudent = (req, res) => {
   const content = req.body;
 
-  let name = content.name;
-  let rollNumber = content.roll;
-  let cgpa = content.cgpa;
-  let email = content.email;
-  let address = content.email;
-  let placementRecord = content.placement;
-  let stream = content.stream;
-  let semester = content.semester;
-  let newObj = { name, rollNumber, cgpa, email, address, placementRecord, stream, semester };
+  let Name = content.Name;
+  let Roll_Number = content.Roll_Number;
+  let CGPA = content.CGPA;
+  let Email = content.Email;
+  let Address = content.Address;
+  let Placement_Record = content.Placement_Record;
+  let Stream = content.Stream;
+  let Semester = content.Semester;
+
+  let newObj = { Name, Roll_Number, CGPA, Email, Address, Placement_Record, Stream, Semester };
 
   let new_JSON_Array = [];
 
@@ -129,7 +131,7 @@ export const updateStudent = (req, res) => {
 
   if (returnMsg == null) {
     for (let i of fileContent) {
-      if (i.rollNumber == rollNumber) {
+      if (i.Roll_Number == Roll_Number) {
         returnMsg = {
           msg: "Success",
         };

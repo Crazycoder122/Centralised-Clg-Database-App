@@ -26,20 +26,20 @@ export const getEmployees = (req, res) => {
 export const createEmployee = (req, res) => {
   let content = req.body;
 
-  let name = content.name;
-  let age = content.age;
-  let email = content.email;
-  let joinedAt = content.joinedAt;
-  let responsibility = content.responsibility;
+  let Name = content.Name;
+  let Age = content.Age;
+  let Email = content.Email;
+  let Joined_At = content.Joined_At;
+  let Responsibility = content.Responsibility;
 
-  let newObj = { name, age, email, joinedAt, responsibility };
+  let newObj = { Name, Age, Email, Joined_At, Responsibility };
 
   let returnMsg = null;
 
   const fileContent = JSON.parse(fs.readFileSync(employeeDB, "utf-8"));
 
   for (let i of fileContent) {
-    if (i.email === newObj.email) {
+    if (i.Email === newObj.Email) {
       returnMsg = {
         msg: "Failure",
         error: "Employee with the same Email exists",
@@ -64,7 +64,7 @@ export const createEmployee = (req, res) => {
 };
 
 export const deleteEmployee = (req, res) => {
-  const email = req.body.email;
+  const email = req.body.Email;
 
   let fileContent = JSON.parse(fs.readFileSync(employeeDB, "utf-8"));
 
@@ -72,7 +72,7 @@ export const deleteEmployee = (req, res) => {
   let returnMsg = null;
 
   for (let i of fileContent) {
-    if (i.email == email) {
+    if (i.Email == email) {
       returnMsg = {
         msg: "Success",
       };
@@ -99,13 +99,13 @@ export const deleteEmployee = (req, res) => {
 export const updateEmployee = (req, res) => {
   let content = req.body;
 
-  let name = content.name;
-  let age = content.age;
-  let email = content.email;
-  let joinedAt = content.joinedAt;
-  let responsibility = content.responsibility;
+  let Name = content.Name;
+  let Age = content.Age;
+  let Email = content.Email;
+  let Joined_At = content.Joined_At;
+  let Responsibility = content.Responsibility;
 
-  let newObj = { name, age, email, joinedAt, responsibility };
+  let newObj = { Name, Age, Email, Joined_At, Responsibility };
 
   let returnMsg = null;
   let new_JSON_Array = [];
@@ -123,7 +123,7 @@ export const updateEmployee = (req, res) => {
 
   if (returnMsg == null) {
     for (let i of fileContent) {
-      if (i.email === email) {
+      if (i.Email === Email) {
         returnMsg = {
           msg: "Success",
         };

@@ -27,20 +27,20 @@ export const getTeachers = (req, res) => {
 export const createTeacher = (req, res) => {
   let content = req.body;
 
-  let name = content.name;
-  let email = content.email;
-  let age = content.age;
-  let joinedAt = content.joinedAt;
-  let researchInterests = content.research;
-  let subjectsAssigned = content.subjectsAssigned;
+  let Name = content.Name;
+  let Email = content.Email;
+  let Age = content.Age;
+  let Joined_At = content.Joined_At;
+  let Research_Interests = content.Research_Interests;
+  let Subjects_Assigned = content.Subjects_Assigned;
 
   let newObj = {
-    name,
-    email,
-    age,
-    joinedAt,
-    researchInterests,
-    subjectsAssigned,
+    Name,
+    Email,
+    Age,
+    Joined_At,
+    Research_Interests,
+    Subjects_Assigned,
   };
 
   let returnMsg = null;
@@ -48,7 +48,7 @@ export const createTeacher = (req, res) => {
   const fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
 
   for (let i of fileContent) {
-    if (i.email === newObj.email) {
+    if (i.Email === newObj.Email) {
       returnMsg = {
         msg: "Failure",
         error: "Teacher with the same Email exists",
@@ -73,7 +73,7 @@ export const createTeacher = (req, res) => {
 };
 
 export const deleteTeacher = (req, res) => {
-  const email = req.body.email;
+  const email = req.body.Email;
 
   let fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
 
@@ -81,7 +81,7 @@ export const deleteTeacher = (req, res) => {
   let returnMsg = null;
 
   for (let i of fileContent) {
-    if (i.email === email) {
+    if (i.Email === email) {
       returnMsg = {
         msg: "Success",
       };
@@ -94,7 +94,6 @@ export const deleteTeacher = (req, res) => {
 
   if (returnMsg == null) {
 
-    console.log("Hello world");
     returnMsg = {
       msg: "Failure",
       error: "Teacher with Given Email Address does not exist",
@@ -108,24 +107,23 @@ export const deleteTeacher = (req, res) => {
 };
 
 export const updateTeacher = (req, res) => {
-  const content = req.body;
+  let content = req.body;
 
-  let name = content.name;
-  let email = content.email;
-  let age = content.age;
-  let joinedAt = content.joinedAt;
-  let researchInterests = content.researchInterests;
-  let subjectsAssigned = content.subjectsAssigned;
+  let Name = content.Name;
+  let Email = content.Email;
+  let Age = content.Age;
+  let Joined_At = content.Joined_At;
+  let Research_Interests = content.Research_Interests;
+  let Subjects_Assigned = content.Subjects_Assigned;
 
   let newObj = {
-    name,
-    email,
-    age,
-    joinedAt,
-    researchInterests,
-    subjectsAssigned,
+    Name,
+    Email,
+    Age,
+    Joined_At,
+    Research_Interests,
+    Subjects_Assigned
   };
-
 
   let returnMsg = null;
   let new_JSON_Array = [];
@@ -143,7 +141,7 @@ export const updateTeacher = (req, res) => {
 
   if (returnMsg == null) {
     for (let i of fileContent) {
-      if (i.email === email) {
+      if (i.Email === Email) {
         returnMsg = {
           msg: "Success",
         };
