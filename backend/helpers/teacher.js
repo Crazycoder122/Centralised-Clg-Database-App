@@ -1,30 +1,33 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  limit,
+  setDoc,
+} from "firebase/firestore";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { checkIfNoMidification } from "./utils.js";
 
-const teacherDB = path.join(__dirname, "../Databases/teacher.json");
+const db = getFirestore();
+const teacherRef = collection(db, "Teacher");
 
-const checkIfNoMidification = (obj, objArray) => {
-  for (let i of objArray) {
-    if (JSON.stringify(obj) === JSON.stringify(i)) return true;
-  }
+export const getTeachers = async (req, res) => {
+  const docsCollection = await getDocs(teacherRef);
 
-  return false;
+  const teacherArray = [];
+
+  docsCollection.forEach((d) => {
+    teacherArray.push(d.data());
+  });
+
+  res.send(teacherArray);
 };
 
-
-export const getTeachers = (req, res) => {
-  const fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
-
-  console.log(fileContent);
-  res.status(200);
-  res.send(fileContent);
-};
-
-export const createTeacher = (req, res) => {
+export const createTeacher = async (req, res) => {
   let content = req.body;
 
   let Name = content.Name;
@@ -45,25 +48,21 @@ export const createTeacher = (req, res) => {
 
   let returnMsg = null;
 
-  const fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
+  const q = await getDocs(query(teacherRef, where("Email", "==", Email)));
 
-  for (let i of fileContent) {
-    if (i.Email === newObj.Email) {
-      returnMsg = {
-        msg: "Failure",
-        error: "Teacher with the same Email exists",
-      };
+  if (!q.empty) {
+    returnMsg = {
+      msg: "Failure",
+      err: "Teacher with same Email Exists",
+    };
 
-      res.status(409);
-    }
-  }
-
-  if (returnMsg == null) {
-    fileContent.push(newObj);
-    fs.writeFileSync(teacherDB, JSON.stringify(fileContent));
+    res.status(409);
+  } else {
+    const doc_ref = await addDoc(teacherRef, newObj);
 
     returnMsg = {
-      msg: "Successs",
+      msg: "Success",
+      id: doc_ref.id,
     };
 
     res.status(200);
@@ -72,41 +71,37 @@ export const createTeacher = (req, res) => {
   res.send(returnMsg);
 };
 
-export const deleteTeacher = (req, res) => {
-  const email = req.body.Email;
+export const deleteTeacher = async (req, res) => {
+  let Email = req.body.Email;
 
-  let fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
+  let returnMsg = {};
 
-  let new_JSON_Array = [];
-  let returnMsg = null;
+  let q = await getDocs(
+    query(teacherRef, where("Email", "==", Email), limit(1))
+  );
 
-  for (let i of fileContent) {
-    if (i.Email === email) {
-      returnMsg = {
-        msg: "Success",
-      };
-      res.status(200);
-      continue;
-    }
-
-    new_JSON_Array.push(i);
-  }
-
-  if (returnMsg == null) {
-
+  if (q.empty) {
     returnMsg = {
       msg: "Failure",
-      error: "Teacher with Given Email Address does not exist",
+      err: "Teacher with Email does not exist",
     };
 
     res.status(404);
-  }
-  fs.writeFileSync(teacherDB, JSON.stringify(new_JSON_Array));
+  } else {
+    q.forEach(async (d) => {
+      await deleteDoc(d.ref);
+    });
 
+    returnMsg = {
+      msg: "success",
+    };
+
+    res.status(200);
+  }
   res.send(returnMsg);
 };
 
-export const updateTeacher = (req, res) => {
+export const updateTeacher = async (req, res) => {
   let content = req.body;
 
   let Name = content.Name;
@@ -122,50 +117,49 @@ export const updateTeacher = (req, res) => {
     Age,
     Joined_At,
     Research_Interests,
-    Subjects_Assigned
+    Subjects_Assigned,
   };
 
   let returnMsg = null;
-  let new_JSON_Array = [];
 
-  const fileContent = JSON.parse(fs.readFileSync(teacherDB, "utf-8"));
-  if (checkIfNoMidification(newObj, fileContent)) {
+  const q = await getDocs(
+    query(teacherRef, where("Email", "==", Email), limit(1))
+  );
 
+  if (q.empty) {
     returnMsg = {
       msg: "Failure",
-      error: "No Modification to the original record",
+      err: "Teacher with Email does not exist",
     };
 
-    res.status(409);
-  }
+    res.status(404);
+  } else {
+    let dataObtained = q.docs.map((d) => d.data())[0];
 
-  if (returnMsg == null) {
-    for (let i of fileContent) {
-      if (i.Email === Email) {
-        returnMsg = {
-          msg: "Success",
-        };
-        res.status(200);
-        new_JSON_Array.push(newObj);
-        console.log(new_JSON_Array[new_JSON_Array.length - 1]);
-        continue;
-      }
-
-      new_JSON_Array.push(i);
-    }
-
-    if (returnMsg == null) {
+    console.log(
+      checkIfNoMidification(newObj, dataObtained),
+      newObj,
+      dataObtained
+    );
+    if (checkIfNoMidification(newObj, dataObtained)) {
       returnMsg = {
         msg: "Failure",
-        error: "Teacher with the Given Email Address not found",
+        err: "No Modification to original Record",
       };
 
-      res.status(404);
-    }
+      res.status(409);
+    } else {
+      q.forEach(async (d) => {
+        await setDoc(d.ref, newObj);
+      });
 
-    fs.writeFileSync(teacherDB, JSON.stringify(new_JSON_Array));
+      returnMsg = {
+        msg: "success",
+      };
+
+      res.status(200);
+    }
   }
 
   res.send(returnMsg);
-
 };

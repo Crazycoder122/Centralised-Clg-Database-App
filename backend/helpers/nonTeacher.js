@@ -1,29 +1,33 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  limit,
+  setDoc,
+} from "firebase/firestore";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { checkIfNoMidification } from "./utils.js";
 
-const employeeDB = path.join(__dirname, "../Databases/employee.json");
+const db = getFirestore();
+const EmployeeRef = collection(db, "Employee");
 
-const checkIfNoMidification = (obj, objArray) => {
-  for (let i of objArray) {
-    if (JSON.stringify(obj) === JSON.stringify(i)) return true;
-  }
+export const getEmployees = async (req, res) => {
+  const docsCollection = await getDocs(EmployeeRef);
 
-  return false;
+  const EmployeeArray = [];
+
+  docsCollection.forEach((d) => {
+    EmployeeArray.push(d.data());
+  });
+
+  res.send(EmployeeArray);
 };
 
-export const getEmployees = (req, res) => {
-  const fileContent = JSON.parse(fs.readFileSync(employeeDB, "utf-8"));
-
-  console.log(fileContent);
-  res.status(200);
-  res.send(fileContent);
-};
-
-export const createEmployee = (req, res) => {
+export const createEmployee = async (req, res) => {
   let content = req.body;
 
   let Name = content.Name;
@@ -33,28 +37,26 @@ export const createEmployee = (req, res) => {
   let Responsibility = content.Responsibility;
 
   let newObj = { Name, Age, Email, Joined_At, Responsibility };
-
+  console.log(newObj);
   let returnMsg = null;
 
-  const fileContent = JSON.parse(fs.readFileSync(employeeDB, "utf-8"));
+  console.log("Hello");
 
-  for (let i of fileContent) {
-    if (i.Email === newObj.Email) {
-      returnMsg = {
-        msg: "Failure",
-        error: "Employee with the same Email exists",
-      };
+  const q = await getDocs(query(EmployeeRef, where("Email", "==", Email)));
 
-      res.status(409);
-    }
-  }
+  if (!q.empty) {
+    returnMsg = {
+      msg: "Failure",
+      err: "Employee with same Email Exists",
+    };
 
-  if (returnMsg == null) {
-    fileContent.push(newObj);
-    fs.writeFileSync(employeeDB, JSON.stringify(fileContent));
+    res.status(409);
+  } else {
+    const doc_ref = await addDoc(EmployeeRef, newObj);
 
     returnMsg = {
-      msg: "Successs",
+      msg: "Success",
+      id: doc_ref.id,
     };
 
     res.status(200);
@@ -63,40 +65,37 @@ export const createEmployee = (req, res) => {
   res.send(returnMsg);
 };
 
-export const deleteEmployee = (req, res) => {
-  const email = req.body.Email;
+export const deleteEmployee = async (req, res) => {
+  let Email = req.body.Email;
 
-  let fileContent = JSON.parse(fs.readFileSync(employeeDB, "utf-8"));
+  let returnMsg = {};
 
-  let new_JSON_Array = [];
-  let returnMsg = null;
+  let q = await getDocs(
+    query(EmployeeRef, where("Email", "==", Email), limit(1))
+  );
 
-  for (let i of fileContent) {
-    if (i.Email == email) {
-      returnMsg = {
-        msg: "Success",
-      };
-      res.status(200);
-      continue;
-    }
-
-    new_JSON_Array.push(i);
-  }
-
-  if (returnMsg == null) {
+  if (q.empty) {
     returnMsg = {
       msg: "Failure",
-      error: "Employee with Given Email Address does not exist",
+      err: "Employee with Email does not exist",
     };
 
     res.status(404);
-  }
-  fs.writeFileSync(employeeDB, JSON.stringify(new_JSON_Array));
+  } else {
+    q.forEach(async (d) => {
+      await deleteDoc(d.ref);
+    });
 
+    returnMsg = {
+      msg: "success",
+    };
+
+    res.status(200);
+  }
   res.send(returnMsg);
 };
 
-export const updateEmployee = (req, res) => {
+export const updateEmployee = async (req, res) => {
   let content = req.body;
 
   let Name = content.Name;
@@ -106,48 +105,46 @@ export const updateEmployee = (req, res) => {
   let Responsibility = content.Responsibility;
 
   let newObj = { Name, Age, Email, Joined_At, Responsibility };
-
   let returnMsg = null;
-  let new_JSON_Array = [];
 
-  const fileContent = JSON.parse(fs.readFileSync(employeeDB, "utf-8"));
+  const q = await getDocs(
+    query(EmployeeRef, where("Email", "==", Email), limit(1))
+  );
 
-  if (checkIfNoMidification(newObj, fileContent)) {
+  if (q.empty) {
     returnMsg = {
       msg: "Failure",
-      error: "No Modification to the original record",
+      err: "Employee with Email does not exist",
     };
 
-    res.status(409);
-  }
+    res.status(404);
+  } else {
+    let dataObtained = q.docs.map((d) => d.data())[0];
 
-  if (returnMsg == null) {
-    for (let i of fileContent) {
-      if (i.Email === Email) {
-        returnMsg = {
-          msg: "Success",
-        };
-        res.status(200);
-        new_JSON_Array.push(newObj);
-        console.log(new_JSON_Array[new_JSON_Array.length - 1]);
-        continue;
-      }
-
-      new_JSON_Array.push(i);
-    }
-
-    if (returnMsg == null) {
+    console.log(
+      checkIfNoMidification(newObj, dataObtained),
+      newObj,
+      dataObtained
+    );
+    if (checkIfNoMidification(newObj, dataObtained)) {
       returnMsg = {
         msg: "Failure",
-        error: "Employee with the Given Email Address not found",
+        err: "No Modification to original Record",
       };
 
-      res.status(404);
-    }
+      res.status(409);
+    } else {
+      q.forEach(async (d) => {
+        await setDoc(d.ref, newObj);
+      });
 
-    fs.writeFileSync(employeeDB, JSON.stringify(new_JSON_Array));
+      returnMsg = {
+        msg: "success",
+      };
+
+      res.status(200);
+    }
   }
 
   res.send(returnMsg);
-
 };

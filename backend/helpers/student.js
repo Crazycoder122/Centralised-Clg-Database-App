@@ -1,29 +1,33 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  limit,
+  setDoc,
+} from "firebase/firestore";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { checkIfNoMidification } from "./utils.js";
 
-const studentDB = path.join(__dirname, "../Databases/student.json");
+const db = getFirestore();
+const studentRef = collection(db, "Student");
 
-const checkIfNoMidification = (obj, objArray) => {
-  for (let i of objArray) {
-    if (JSON.stringify(obj) === JSON.stringify(i)) return true;
-  }
+export const getStudents = async (req, res) => {
+  const docsCollection = await getDocs(studentRef);
 
-  return false;
+  const studentArray = [];
+
+  docsCollection.forEach((d) => {
+    studentArray.push(d.data());
+  });
+
+  res.send(studentArray);
 };
 
-export const getStudents = (req, res) => {
-  const fileContent = JSON.parse(fs.readFileSync(studentDB, "utf-8"));
-
-  console.log(fileContent);
-  res.status(200);
-  res.send(fileContent);
-};
-
-export const createStudent = (req, res) => {
+export const createStudent = async (req, res) => {
   const content = req.body;
 
   let Name = content.Name;
@@ -31,33 +35,48 @@ export const createStudent = (req, res) => {
   let CGPA = content.CGPA;
   let Email = content.Email;
   let Address = content.Address;
-  let Placement_Record = content.Placement_Record;
+  let Placement_Record = content.Placement_Record || null;
   let Stream = content.Stream;
   let Semester = content.Semester;
 
-  let newObj = { Name, Roll_Number, CGPA, Email, Address, Placement_Record, Stream, Semester };
+  let newObj = {
+    Name,
+    Roll_Number,
+    CGPA,
+    Email,
+    Address,
+    Placement_Record,
+    Stream,
+    Semester,
+  };
 
   let returnMsg = null;
 
-  const fileContent = JSON.parse(fs.readFileSync(studentDB, "utf-8"));
+  const q1 = await getDocs(query(studentRef, where("Email", "==", Email)));
+  const q2 = await getDocs(
+    query(studentRef, where("Roll_Number", "==", Roll_Number))
+  );
 
-  for (let i of fileContent) {
-    if (i.Roll_Number === newObj.Roll_Number || i.Email == newObj.Email) {
-      returnMsg = {
-        msg: "Failure",
-        error: "Student with the same Roll Number/Email exists",
-      };
+  if (!q1.empty) {
+    returnMsg = {
+      msg: "Failure",
+      err: "Student with same Email Exists",
+    };
 
-      res.status(409);
-    }
-  }
+    res.status(409);
+  } else if (!q2.empty) {
+    returnMsg = {
+      msg: "Failure",
+      err: "Student with same Roll Number Exists",
+    };
 
-  if (returnMsg == null) {
-    fileContent.push(newObj);
-    fs.writeFileSync(studentDB, JSON.stringify(fileContent));
+    res.status(409);
+  } else {
+    const doc_ref = await addDoc(studentRef, newObj);
 
     returnMsg = {
-      msg: "Successs",
+      msg: "Success",
+      id: doc_ref.id,
     };
 
     res.status(200);
@@ -66,41 +85,37 @@ export const createStudent = (req, res) => {
   res.send(returnMsg);
 };
 
-export const deleteStudent = (req, res) => {
-  const roll = req.body.Roll_Number;
+export const deleteStudent = async (req, res) => {
+  let Roll_Number = req.body.Roll_Number;
 
-  let fileContent = JSON.parse(fs.readFileSync(studentDB, "utf-8"));
+  let returnMsg = {};
 
-  let new_JSON_Array = [];
-  let returnMsg = null;
+  let q = await getDocs(
+    query(studentRef, where("Roll_Number", "==", Roll_Number), limit(1))
+  );
 
-  for (let i of fileContent) {
-    if (i.Roll_Number == roll) {
-      returnMsg = {
-        msg: "Success",
-      };
-      res.status(200);
-      continue;
-    }
-
-    new_JSON_Array.push(i);
-  }
-
-  if (returnMsg == null) {
+  if (q.empty) {
     returnMsg = {
       msg: "Failure",
-      error: "Student with Given Roll Number does not exist",
+      err: "Student with Roll Number does not exist",
     };
 
     res.status(404);
+  } else {
+    q.forEach(async (d) => {
+      await deleteDoc(d.ref);
+    });
+
+    returnMsg = {
+      msg: "success",
+    };
+
+    res.status(200);
   }
-
-  fs.writeFileSync(studentDB, JSON.stringify(new_JSON_Array));
-
   res.send(returnMsg);
 };
 
-export const updateStudent = (req, res) => {
+export const updateStudent = async (req, res) => {
   const content = req.body;
 
   let Name = content.Name;
@@ -108,53 +123,56 @@ export const updateStudent = (req, res) => {
   let CGPA = content.CGPA;
   let Email = content.Email;
   let Address = content.Address;
-  let Placement_Record = content.Placement_Record;
+  let Placement_Record = content.Placement_Record || null;
   let Stream = content.Stream;
   let Semester = content.Semester;
 
-  let newObj = { Name, Roll_Number, CGPA, Email, Address, Placement_Record, Stream, Semester };
-
-  let new_JSON_Array = [];
-
   let returnMsg = null;
 
-  const fileContent = JSON.parse(fs.readFileSync(studentDB, "utf-8"));
+  let newObj = {
+    Name,
+    Roll_Number,
+    CGPA,
+    Email,
+    Address,
+    Placement_Record,
+    Stream,
+    Semester,
+  };
 
-  if (checkIfNoMidification(newObj, fileContent)) {
+  const q = await getDocs(
+    query(studentRef, where("Roll_Number", "==", Roll_Number), limit(1))
+  );
+
+  if (q.empty) {
     returnMsg = {
       msg: "Failure",
-      error: "No Modification to the original record",
-    };
-
-    res.status(409);
-  }
-
-  if (returnMsg == null) {
-    for (let i of fileContent) {
-      if (i.Roll_Number == Roll_Number) {
-        returnMsg = {
-          msg: "Success",
-        };
-        res.status(200);
-        new_JSON_Array.push(newObj);
-        console.log(new_JSON_Array[new_JSON_Array.length - 1]);
-        continue;
-      }
-
-      new_JSON_Array.push(i);
-    }
-  }
-
-  if (returnMsg == null) {
-    returnMsg = {
-      msg: "Failure",
-      error: "Student with the Given Roll Number not found",
+      err: "Student with Roll Number does not exist",
     };
 
     res.status(404);
-  }
+  } else {
+    let dataObtained = q.docs.map((d) => d.data())[0];
 
-  fs.writeFileSync(studentDB, JSON.stringify(new_JSON_Array));
+    if (checkIfNoMidification(newObj, dataObtained)) {
+      returnMsg = {
+        msg: "Failure",
+        err: "No Modification to original Record",
+      };
+
+      res.status(409);
+    } else {
+      q.forEach(async (d) => {
+        await setDoc(d.ref, newObj);
+      });
+
+      returnMsg = {
+        msg: "success",
+      };
+
+      res.status(200);
+    }
+  }
 
   res.send(returnMsg);
 };

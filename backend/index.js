@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
+import {firebaseApp} from './firebase_setup.js';
+
 // Configurations for the Backend
 dotenv.config();
 
