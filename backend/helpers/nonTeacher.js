@@ -87,7 +87,7 @@ export const deleteEmployee = async (req, res) => {
     });
 
     returnMsg = {
-      msg: "success",
+      msg: "Success",
     };
 
     res.status(200);
@@ -139,7 +139,7 @@ export const updateEmployee = async (req, res) => {
       });
 
       returnMsg = {
-        msg: "success",
+        msg: "Success",
       };
 
       res.status(200);

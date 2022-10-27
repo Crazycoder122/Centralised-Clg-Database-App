@@ -167,7 +167,7 @@ export const updateStudent = async (req, res) => {
       });
 
       returnMsg = {
-        msg: "success",
+        msg: "Success",
       };
 
       res.status(200);

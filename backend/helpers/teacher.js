@@ -93,7 +93,7 @@ export const deleteTeacher = async (req, res) => {
     });
 
     returnMsg = {
-      msg: "success",
+      msg: "Success",
     };
 
     res.status(200);
@@ -154,7 +154,7 @@ export const updateTeacher = async (req, res) => {
       });
 
       returnMsg = {
-        msg: "success",
+        msg: "Success",
       };
 
       res.status(200);
