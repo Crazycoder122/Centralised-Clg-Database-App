@@ -1,6 +1,63 @@
+const handleUpdate = (idx) => {
+    let record = JSON.parse(localStorage.getItem('data'))[idx];
+    updateErrorField.innerText = '';
+
+    buildForm(record);
+}
+
+const handleCreate = (type) => {
+    buildForm();
+}
+
+const handleDelete = async (idx) => {
+    const targetRecord =
+      activeLink === "student"
+        ? JSON.parse(localStorage.getItem("data"))[idx].Roll_Number
+        : JSON.parse(localStorage.getItem("data"))[idx].Email;
+  
+    let res = await deleteRecord(activeLink,targetRecord);
+
+    console.log(res);
+    if(res.msg === 'Success'){
+        let dataChunk = await getData(activeLink);
+        console.log("here-1");
+        populate(dataChunk);
+        localStorage.setItem('data',dataChunk)
+    }
+};
+
+const getData = async (type) => await (await fetch(URL[type])).json();
+
+const updateData = async (type,data) => {
+    const link = URL[type];
+    let returnObj = {};
+
+    try{
+        let res = await fetch(link,{
+            'method' : "PATCH",
+            'headers' : {
+                'Content-Type' : 'application/json'
+            },
+            'body' : JSON.stringify(data)
+        });
+
+        res = await res.json();
+
+        return res;
+    } 
+    catch(error){
+        returnObj = {
+            "msg" : "failure",
+            "error" : error
+        }
+    }
+
+    return returnObj;
+}   
+
+
 const deleteRecord = async (type,Param) => {
 
-    console.log(Param);
     const url = URL[type];
 
     let returnObj = {};
@@ -8,11 +65,12 @@ const deleteRecord = async (type,Param) => {
     let reqBody = {};
 
     if(type === 'student')
-        reqBody["roll"] = (Param);
+        reqBody["Roll_Number"] = (Param);
 
     else
-        reqBody["email"] = Param;
+        reqBody["Email"] = Param;
     
+        console.log(JSON.stringify(reqBody));
     try {
         let res = await fetch(url,{
             'method' : "DELETE",
@@ -32,36 +90,35 @@ const deleteRecord = async (type,Param) => {
             err : error
         }
     }
+
+    return returnObj
 }   
 
 
-const updateRecord = async(type,Param) => {
+const postData = async(type,data) => {
+    const link = URL[type];
+    let returnObj = {};
 
-}
+    try{
+        let res = await fetch(link,{
+            'method' : "POST",
+            'headers' : {
+                'Content-Type' : 'application/json'
+            },
+            'body' : JSON.stringify(data)
+        });
 
+        res = await res.json();
 
-const createUpdateForm = (data) => {
-    let keys = Object.keys(data);
-
-    updateForm.innerHTML = '';
-    for(let i of keys){
-
-        let formField = document.createElement('input');;
-        let label = document.createElement('label');
-        label.classList.add('form-label')
-        let div = document.createElement('div');
-        div.classList.add("form-field-div");
-
-        div.appendChild(label);
-        div.appendChild(formField);
-        label.innerText = filterMap[i]+':';
-        formField.value = data[i];
-
-        if(typeof(data[i]) === 'string')
-            formField.setAttribute('type','text');
-        
-        if(i === 'email' || i === 'rollNumber')
-            formField.setAttribute('disabled',true)
-        updateForm.appendChild(div)
+        return res;
+    } 
+    catch(error){
+        returnObj = {
+            "msg" : "failure",
+            "error" : error
+        }
     }
+
+    return returnObj;
+
 }
