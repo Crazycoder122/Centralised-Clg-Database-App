@@ -71,6 +71,17 @@ const populate = (data) => {
   contentPanel.innerHTML = "";
   if (data.length === 0) {
     contentPanel.innerHTML = `<h1>No ${activeLink} Data Found</h1>`;
+
+    let createBtn = document.createElement('button');
+    createBtn.innerText = `Create ${activeLink} Record`;
+    createBtn.classList.add('btn');
+    createBtn.classList.add('btn-warning');
+    createBtn.setAttribute('onclick',`handleCreate("${activeLink}")`);
+    createBtn.setAttribute('data-bs-toggle','modal');
+    createBtn.setAttribute('data-bs-target','#createModal');
+    contentPanel.appendChild(createBtn);
+
+    console.log("Here-2");
     return;
   }
 
@@ -165,12 +176,11 @@ const buildForm = (data) => {
     label.innerText = i["label"]+ ':';
 
     const ip = getAppropriateInput(i,data);
-    ip.removeAttribute('disabled')
+    data ? null : ip.removeAttribute('disabled');
     data ? ip.value = data[getAppropriateInputName(i["label"])] : null;
 
     div.appendChild(label);
     div.appendChild(ip);
     data ? updateForm.appendChild(div) : createForm.appendChild(div);
-    // data ? updateForm.appendChild(ip) : createForm.appendChild(ip);
   }
 };

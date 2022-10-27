@@ -6,6 +6,12 @@ import cors from 'cors';
 
 import {firebaseApp} from './firebase_setup.js';
 
+
+// Route Imports
+import studentRoutes from './routes/student.js';
+import teacherRoutes from './routes/teacher.js';
+import nonTeacherRoutes from './routes/nonTeacher.js';
+
 // Configurations for the Backend
 dotenv.config();
 
@@ -14,13 +20,6 @@ const PORT = process.env.PORT || 80;
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 app.use(cors());
-
-// Route Imports
-import studentRoutes from './routes/student.js';
-import teacherRoutes from './routes/teacher.js';
-import nonTeacherRoutes from './routes/nonTeacher.js';
-
-
 
 
 

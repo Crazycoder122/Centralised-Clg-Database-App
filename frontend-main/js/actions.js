@@ -9,6 +9,22 @@ const handleCreate = (type) => {
     buildForm();
 }
 
+const handleDelete = async (idx) => {
+    const targetRecord =
+      activeLink === "student"
+        ? JSON.parse(localStorage.getItem("data"))[idx].Roll_Number
+        : JSON.parse(localStorage.getItem("data"))[idx].Email;
+  
+    let res = await deleteRecord(activeLink,targetRecord);
+
+    console.log(res);
+    if(res.msg === 'Success'){
+        let dataChunk = await getData(activeLink);
+        console.log("here-1");
+        populate(dataChunk);
+        localStorage.setItem('data',dataChunk)
+    }
+};
 
 const getData = async (type) => await (await fetch(URL[type])).json();
 
@@ -42,7 +58,6 @@ const updateData = async (type,data) => {
 
 const deleteRecord = async (type,Param) => {
 
-    console.log(Param);
     const url = URL[type];
 
     let returnObj = {};
@@ -50,11 +65,12 @@ const deleteRecord = async (type,Param) => {
     let reqBody = {};
 
     if(type === 'student')
-        reqBody["roll"] = (Param);
+        reqBody["Roll_Number"] = (Param);
 
     else
-        reqBody["email"] = Param;
+        reqBody["Email"] = Param;
     
+        console.log(JSON.stringify(reqBody));
     try {
         let res = await fetch(url,{
             'method' : "DELETE",
@@ -74,6 +90,8 @@ const deleteRecord = async (type,Param) => {
             err : error
         }
     }
+
+    return returnObj
 }   
 
 

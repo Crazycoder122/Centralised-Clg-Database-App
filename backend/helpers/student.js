@@ -107,11 +107,13 @@ export const deleteStudent = async (req, res) => {
     });
 
     returnMsg = {
-      msg: "success",
+      msg: "Success",
     };
 
     res.status(200);
   }
+
+  console.log("Here");
   res.send(returnMsg);
 };
 
