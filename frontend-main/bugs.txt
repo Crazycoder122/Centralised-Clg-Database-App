@@ -1,0 +1,2 @@
+1) Toast doesn't appear
+2) Modal opens only once

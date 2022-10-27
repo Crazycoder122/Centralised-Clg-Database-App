@@ -1,0 +1,20 @@
+.form-field-div{
+    margin-bottom : 5px;
+  }
+
+  .form-label{
+    margin-right:5px
+  }
+
+  input:focus{
+    outline: none;
+  }
+
+
+  input:invalid{
+    border:3px solid red
+  }
+
+  .form-ip-div{
+    margin-bottom: 2%;
+  }
