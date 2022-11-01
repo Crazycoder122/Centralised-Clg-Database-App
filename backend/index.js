@@ -12,6 +12,13 @@ import studentRoutes from './routes/student.js';
 import teacherRoutes from './routes/teacher.js';
 import nonTeacherRoutes from './routes/nonTeacher.js';
 
+const verySusMiddleware = (req,res) => {
+    const ip = req.ip;
+
+    
+}
+
+
 // Configurations for the Backend
 dotenv.config();
 
@@ -23,7 +30,7 @@ app.use(cors());
 
 
 
-
+app.use(verySusMiddleware)
 // Route Settings
 app.use('/student',studentRoutes);
 app.use('/teacher',teacherRoutes);

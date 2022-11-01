@@ -22,7 +22,7 @@ const handleDelete = async (idx) => {
         let dataChunk = await getData(activeLink);
         console.log("here-1");
         populate(dataChunk);
-        localStorage.setItem('data',dataChunk)
+        localStorage.setItem('data',JSON.stringify(dataChunk))
     }
 };
 
