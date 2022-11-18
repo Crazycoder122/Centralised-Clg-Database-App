@@ -117,6 +117,7 @@ const populate = (data) => {
     i = getProperOrientedObject(i)
     let tr = getTableRow(i, cnt);
     tableBody.appendChild(tr);
+    cnt+=1;
   }
 
   contentPanel.appendChild(table);
